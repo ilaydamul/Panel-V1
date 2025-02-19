@@ -1,22 +1,33 @@
-import Header from "./components/Layout/Header";
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Login from "./screens/Auth/Login";
+import Services from './screens/Services';
+
+function AuthStack() {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="*" element={<Navigate to="/login" />} />
+    </Routes>
+  );
+}
+
+function AppStack() {
+  return (
+    <Routes>
+      <Route path="/" element={<Services/>} />
+      <Route path="/services" element={<Services/>} />
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  );
+}
 
 function App() {
+  const isAuthenticated = true;
+
   return (
-    <div className="wrapper">
-      <Header />
-      {/* <!-- PANEL CONTENT --> */}
-      <div className="main">
-        <div className="main-top">
-          <button className="toggle-panel"><i className="fa-solid fa-chevron-left"></i></button>
-                Anasayfa {'>'} Bloglar
-        </div>
-
-        <div className="main-content">
-          <h1 className="main-title">Bloglar</h1>
-        </div>
-      </div>
-    </div>
-
+    <Router>
+      {isAuthenticated ? <AppStack /> : <AuthStack />}
+    </Router>
   );
 }
 
