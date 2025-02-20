@@ -46,10 +46,9 @@ const Services = () => {
             // Görseli backend'e yükle
             if (newService.image) {
                 const imageUrl = await uploadImageToBackend(newService.image);
-                newService.image = "http://localhost:5000" + imageUrl; // Backend'den dönen görsel URL'sini kaydediyoruz
+                newService.image = "http://localhost:5000" + imageUrl;
             }
 
-            // Eğer tüm alanlar doluysa, yeni hizmeti backend'e gönder
             if (!newService.title || !newService.description || !newService.content || !newService.image) {
                 console.log(newService);
                 Swal.fire({
@@ -60,11 +59,12 @@ const Services = () => {
                 return;
             }
 
-            //API'ye veri gönderme işlemi (görsel URL'si ile birlikte)
 
             const response = await axios.post(API_URL, newService);
-            setServices([...services, response.data]);
-            setDialogVisible(false); // Modal'ı kapat
+            console.log( response.data);
+            
+            setServices([...services, newService]);
+            setDialogVisible(false);
 
         } catch (error) {
             console.error("Hizmet eklenirken hata oluştu:", error);
@@ -76,22 +76,7 @@ const Services = () => {
         }
     };
 
-    // const updateService = async () => {
-    //     try {
-    //         await axios.put(`${API_URL}/${selectedService.id}`, selectedService);
-    //         setServices(
-    //             services.map(service =>
-    //                 service.id === selectedService.id ? selectedService : service
-    //             )
-    //         );
-    //         setDialogVisible(false);
-    //     } catch (error) {
-    //         console.error("Hizmet güncellenirken hata oluştu:", error);
-    //     }
-    // };
-
     const updateService = async (id, updatedService) => {
-        // Kullanıcıdan onay aldıktan sonra güncelleme işlemini gerçekleştiriyoruz
         const result = await Swal.fire({
             title: "Güncellemek istediğinize emin misiniz?",
             text: "Bu işlem geri alınamaz!",
@@ -100,18 +85,21 @@ const Services = () => {
             confirmButtonText: "Evet, güncelle!",
             cancelButtonText: "Hayır, iptal et"
         });
-    
+
         if (result.isConfirmed) {
+
+            if (updatedService.image && updatedService.image.startsWith("data:image")) {
+                const imageUrl = await uploadImageToBackend(updatedService.image);
+                updatedService.image = "http://localhost:5000" + imageUrl; // Backend'den dönen görsel URL'sini kaydediyoruz
+            }
+
             try {
-                // PUT isteği gönderiyoruz
                 const response = await axios.put(`http://localhost:5000/services/${id}`, updatedService);
-    
                 if (response.status === 200) {
-                    // Güncellenen hizmeti listede güncelliyoruz
                     setServices(services.map(service =>
                         service.id === id ? { ...service, ...updatedService } : service
                     ));
-    
+
                     Swal.fire({
                         title: "Başarılı!",
                         text: "Hizmet başarıyla güncellendi.",
@@ -121,7 +109,7 @@ const Services = () => {
                 }
             } catch (error) {
                 console.error("Hizmet güncellenirken hata oluştu:", error);
-    
+
                 Swal.fire({
                     title: "Hata!",
                     text: "Bir hata oluştu, hizmet güncellenemedi.",
@@ -133,7 +121,6 @@ const Services = () => {
     };
 
     const deleteService = async (id) => {
-        // Kullanıcıdan onay aldıktan sonra silme işlemini gerçekleştiriyoruz
         const result = await Swal.fire({
             title: "Silmek istediğinize emin misiniz?",
             text: "Bu işlem geri alınamaz!",
@@ -142,12 +129,11 @@ const Services = () => {
             confirmButtonText: "Evet, sil!",
             cancelButtonText: "Hayır, iptal et"
         });
-    
+
         if (result.isConfirmed) {
             try {
-                // URL'yi doğru yapılandırın
                 const response = await axios.delete(`http://localhost:5000/services/${id}`);
-                
+
                 if (response.status === 200) {
                     setServices(services.filter(service => service.id !== id));
                     Swal.fire({
@@ -159,7 +145,7 @@ const Services = () => {
                 }
             } catch (error) {
                 console.error("Hizmet silinirken hata oluştu:", error);
-    
+
                 Swal.fire({
                     title: "Hata!",
                     text: "Bir hata oluştu, hizmet silinemedi.",
@@ -169,48 +155,26 @@ const Services = () => {
             }
         }
     };
-    
-    
+
     // Görseli base64 formatında okuma işlemi
     const handleFileUpload = (event) => {
-        const file = event.files[0]; // Seçilen dosyayı alıyoruz
+        const file = event.files[0]; 
         if (file) {
-            setLoading(true); // Yükleme başladığında loading aktif
+            setLoading(true); 
             const reader = new FileReader();
 
             reader.onload = (e) => {
                 setSelectedService((prev) => ({
                     ...prev,
-                    image: e.target.result // Görseli base64 olarak kaydediyoruz
+                    image: e.target.result 
                 }));
-                setLoading(false); // Yükleme tamamlanınca loading kapanır
+                setLoading(false); 
             };
 
-            reader.readAsDataURL(file); // Dosyayı okuyoruz
+            reader.readAsDataURL(file); 
         }
     };
 
-    // Görseli backend'e gönderme işlemi
-    // const uploadImageToBackend = async (base64Image) => {
-    //     const formData = new FormData();
-    //     formData.append("image", base64Image); // Görseli "image" adıyla gönderiyoruz
-
-    //     try {
-    //         const response = await fetch("http://localhost:5000/uploads", {
-    //             method: "POST",
-    //             body: formData
-    //         });
-
-    //         const data = await response.json();
-    //         if (data.imageUrl) {
-    //             return data.imageUrl; // Görsel URL'sini döndürüyoruz
-    //         }
-    //         // throw new Error("Görsel yüklenemedi!");
-    //     } catch (error) {
-    //         console.error("Görsel yükleme hatası:", error);
-    //         throw error; // Hata durumunda hatayı fırlatıyoruz
-    //     }
-    // };
     const uploadImageToBackend = async (base64Image) => {
         const formData = new FormData();
         // Base64 verisini dosya formatında backend'e gönderemeyiz. Bunun yerine dosya göndereceğiz.
@@ -243,7 +207,7 @@ const Services = () => {
             throw new Error("Görsel yüklenemedi!");
         } catch (error) {
             console.error("Görsel yükleme hatası:", error);
-            throw error; // Hata durumunda hatayı fırlatıyoruz
+            throw error; 
         }
     };
 
@@ -256,9 +220,8 @@ const Services = () => {
             image: null,
         }));
 
-        // FileUpload bileşeninin içindeki dosyaları sıfırlama
         if (fileUploadRef.current) {
-            fileUploadRef.current.clear(); // PrimeReact FileUpload sıfırlama metodu
+            fileUploadRef.current.clear();
         }
     };
 
@@ -276,7 +239,7 @@ const Services = () => {
     };
 
     const saveService = () => {
-        editMode ? updateService() : addService();
+        editMode ? updateService(selectedService.id, selectedService) : addService();
     };
 
     const actionTemplate = rowData => (
@@ -308,10 +271,8 @@ const Services = () => {
     };
 
     const imageTemplate = (rowData) => {
-        // Eğer image bir nesneyse ve içinde src varsa onu al
         const imageSrc = rowData.image?.src || rowData.image;
-        // console.log(imageSrc);
-
+        
         return imageSrc ? (
             <img
                 src={imageSrc}
@@ -408,7 +369,7 @@ const Services = () => {
                             label="Kaydet"
                             icon="pi pi-check"
                             className="p-button-success p-button-rounded"
-                            onClick={saveService}
+                            onClick={() => saveService()}
                         />
                     </div>
                 </Dialog>

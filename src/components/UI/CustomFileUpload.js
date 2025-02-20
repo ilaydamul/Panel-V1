@@ -27,7 +27,6 @@ function CustomFileUpload({ handleFileUpload, image, handleRemoveImage, fileUplo
                     ref={fileUploadRef}
                 />
 
-                {/* Görsel varsa çöp kutusu butonunu göster */}
                 {image && (
                     <Button
                         icon="pi pi-trash"

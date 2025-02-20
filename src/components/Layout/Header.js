@@ -25,8 +25,8 @@ function Header() {
         <div className="pages">
           <a href="index.html" className="panel-button"><i className="fa-solid fa-house-chimney"></i>
             <span>Anasayfa</span></a>
-          <a href="panel.html" className="panel-button"><i className="fa-solid fa-house-chimney"></i>
-            <span>Panel</span></a>
+          <a href="/services" className="panel-button"><i className="fa-solid fa-house-chimney"></i>
+            <span>Hizmetler</span></a>
         </div>
 
         <div className="header-footer">

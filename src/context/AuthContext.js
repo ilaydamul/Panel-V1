@@ -5,10 +5,14 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+
   useEffect(() => {
     const isAuth = localStorage.getItem('token');
     if (isAuth === 'gusegarage') {
       setIsAuthenticated(true);
+    }
+    else {
+      setIsAuthenticated(false);
     }
   }, []);
 

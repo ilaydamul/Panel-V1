@@ -8,6 +8,7 @@ function AuthStack() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      {/* <Route path="/services" element={<Services />} /> */}
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   );
@@ -16,7 +17,7 @@ function AuthStack() {
 function AppStack() {
   return (
     <Routes>
-      <Route path="/" element={<Services />} />
+      <Route path="/" element={<>asdasd</>} />
       <Route path="/services" element={<Services />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
@@ -25,10 +26,20 @@ function AppStack() {
 
 function AppContent() {
   const { isAuthenticated } = useAuth();
+  console.log(isAuthenticated);
 
   return (
     <Router>
-      {isAuthenticated ? <AppStack /> : <AuthStack />}
+      <Routes>
+        <Route path="/" element={<>asdasd</>} />
+        <Route path="/services" element={<Services />} />
+        {!isAuthenticated && <Route path="/login" element={<Login />} />}
+        {isAuthenticated ? <Route path="*" element={<Navigate to="/" />} /> : <Route path="*" element={<Navigate to="/login" />} />}
+
+      </Routes>
+
+
+      {/* {isAuthenticated ? <AppStack /> : <AuthStack />} */}
     </Router>
   );
 }
