@@ -1,43 +1,58 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import CustomInput from '../../components/UI/CustomInput';
-import { useAuth } from '../../context/AuthContext';
+import { AuthContext } from '../../context/AuthContext';
+import axios from "axios";
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 function Login() {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const { setIsAuthenticated } = useAuth();
-
+    const authCtx = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    // Formik validation and initialization
+    const formik = useFormik({
+        initialValues: {
+            username: '',
+            password: ''
+        },
+        validationSchema: Yup.object({
+            username: Yup.string()
+                .required('Kullanıcı adı gerekli!'),
+            password: Yup.string()
+                .required('Şifre gerekli!')
+                .min(8, 'Şifre en az 8 karakter olmalı')
+                .matches(/[a-zA-Z0-9]/, 'Şifre yalnızca harf ve rakamlardan oluşabilir')
+        }),
+        onSubmit: async (values) => {
+            try {
+                const response = await axios.post('http://localhost:5000/login', {
+                    username: values.username,
+                    password: values.password
+                });
 
-        if (username === "gusegarage" && password === "GuseGarage1q2w3e?") {
-            localStorage.setItem("token", "gusegarage");
-          
-
-            Swal.fire({
-                title: "Giriş Başarılı!",
-                text: "Ana sayfaya yönlendiriliyorsunuz...",
-                icon: "success",
-                timer: 2000,
-                showConfirmButton: false
-            }).then(() => {
-                navigate("/");
-                setIsAuthenticated(true);
-            });
-            // alert("Giriş Başarılı!");
-        } else {
-            Swal.fire({
-                title: "Hatalı Giriş!",
-                text: "Kullanıcı adı veya şifre yanlış.",
-                icon: "error",
-                confirmButtonText: "Tamam"
-            });
+                const token = response.data.token;
+                authCtx.authenticate(token); // Token'i context'e kaydedebilirsin
+                Swal.fire({
+                    title: "Giriş Başarılı!",
+                    text: "Ana sayfaya yönlendiriliyorsunuz...",
+                    icon: "success",
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    navigate("/");
+                });
+            } catch (error) {
+                Swal.fire({
+                    title: "Hatalı Giriş!",
+                    text: "Kullanıcı adı veya şifre yanlış.",
+                    icon: "error",
+                    confirmButtonText: "Tamam"
+                });
+            }
         }
-    };
+    });
 
     return (
         <section className="form-container">
@@ -49,22 +64,26 @@ function Login() {
                     <h1>Giriş Yap</h1>
                     <div className="little-text">Guse Garage'a giriş yapın</div>
                 </div>
-                <form className="custom-form" name="login_form" onSubmit={handleSubmit}>
+                <form className="custom-form" name="login_form" onSubmit={formik.handleSubmit}>
                     <CustomInput
                         type="text"
                         name="username"
                         placeholder="Kullanıcı Adı"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        value={formik.values.username}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.touched.username && formik.errors.username}
                     />
                     <CustomInput
                         type="password"
                         name="password"
                         placeholder="Şifre"
                         id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={formik.values.password}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         icon={<i className="fa-regular fa-eye"></i>}
+                        error={formik.touched.password && formik.errors.password}
                     />
                     <button className="custom-btn" type="submit">Giriş Yap</button>
                 </form>

@@ -1,11 +1,14 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import $ from 'jquery'
+import { AuthContext } from '../../context/AuthContext';
+import { NavLink } from 'react-router-dom';
 
 function Header() {
+  const authCtx = useContext(AuthContext);
 
   function logout() {
-    localStorage.removeItem('token')
-    window.location.href = '/login'
+    authCtx.logout();
+    window.location.href = '/login';
   }
 
   function toggleMenu() {
@@ -30,10 +33,10 @@ function Header() {
           <span className="burger-icon"></span>
         </div>
         <div className="pages">
-          <a href="/" className="panel-button"><i className="fa-solid fa-house-chimney"></i>
-            <span>Anasayfa</span></a>
-          <a href="/services" className="panel-button"><i class="fa-regular fa-chart-bar"></i>
-            <span>Hizmetler</span></a>
+          <NavLink to="/" className="panel-button"><i className="fa-solid fa-house-chimney"></i>
+            <span>Anasayfa</span></NavLink>
+          <NavLink to="/services" className="panel-button"><i className="fa-regular fa-chart-bar"></i>
+            <span>Hizmetler</span></NavLink>
         </div>
 
         <div className="header-footer">

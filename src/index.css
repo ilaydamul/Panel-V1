@@ -74,6 +74,7 @@ img {
     ;
     position: relative;
     transition: .2s ease;
+    z-index: 99;
 }
 
 .main {

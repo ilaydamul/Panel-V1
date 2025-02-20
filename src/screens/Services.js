@@ -283,7 +283,7 @@ const Services = () => {
 
 
     return (
-            <div className="container p-5">
+            <div className="pt-3">
                 <div className="items-center mb-3">
                     <Button
                         label="Ekle"

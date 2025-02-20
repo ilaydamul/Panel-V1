@@ -25,6 +25,10 @@ function Layout({ children, title }) {
                     <h1 className="main-title">{title}</h1>
                     {children}
                 </div>
+
+
+
+                
             </div>
         </div>
 
