@@ -6,10 +6,7 @@ import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Editor } from "primereact/editor";
-import { FileUpload } from "primereact/fileupload";
-import Layout from "../components/Layout/Layout";
 import { InputText } from "primereact/inputtext";
-import { ProgressSpinner } from "primereact/progressspinner";
 import CustomFileUpload from "../components/UI/CustomFileUpload";
 import Loader from "../components/UI/Loader";
 import Swal from 'sweetalert2';
@@ -272,7 +269,7 @@ const Services = () => {
 
     const imageTemplate = (rowData) => {
         const imageSrc = rowData.image?.src || rowData.image;
-        
+
         return imageSrc ? (
             <img
                 src={imageSrc}
@@ -286,7 +283,6 @@ const Services = () => {
 
 
     return (
-        <Layout title="Hizmetler">
             <div className="container p-5">
                 <div className="items-center mb-3">
                     <Button
@@ -374,7 +370,6 @@ const Services = () => {
                     </div>
                 </Dialog>
             </div>
-        </Layout>
     );
 };
 

@@ -1,4 +1,5 @@
 import React from 'react'
+import $ from 'jquery'
 
 function Header() {
 
@@ -7,25 +8,31 @@ function Header() {
     window.location.href = '/login'
   }
 
+  function toggleMenu() {
+    $(".header-burger").toggleClass("active");
+    $(".panel-menu").toggleClass("active");
+    $(".panel-shadow").toggleClass("active");
+  }
+
   return (
     <header className="panel-header">
       <div className="logo-wrapper">
         <div className="logo">
           <img src="/images/guse-garage-logo-siyah.png" alt="Guse Garage Logo" />
         </div>
-        <div className="header-burger">
+        <div className="header-burger" onClick={toggleMenu}>
           <span className="burger-icon"></span>
         </div>
       </div>
       <div className="panel-shadow"></div>
       <div className="panel-menu">
-        <div className="header-burger">
+        <div className="header-burger" onClick={toggleMenu}>
           <span className="burger-icon"></span>
         </div>
         <div className="pages">
-          <a href="index.html" className="panel-button"><i className="fa-solid fa-house-chimney"></i>
+          <a href="/" className="panel-button"><i className="fa-solid fa-house-chimney"></i>
             <span>Anasayfa</span></a>
-          <a href="/services" className="panel-button"><i className="fa-solid fa-house-chimney"></i>
+          <a href="/services" className="panel-button"><i class="fa-regular fa-chart-bar"></i>
             <span>Hizmetler</span></a>
         </div>
 

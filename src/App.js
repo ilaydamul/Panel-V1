@@ -1,8 +1,9 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Login from "./screens/Auth/Login";
 import Services from './screens/Services';
-import { useEffect, useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import Home from './screens/Home';
+import Layout from './components/Layout/Layout';
 
 function AuthStack() {
   return (
@@ -16,11 +17,13 @@ function AuthStack() {
 
 function AppStack() {
   return (
-    <Routes>
-      <Route path="/" element={<>asdasd</>} />
-      <Route path="/services" element={<Services />} />
-      <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </Layout>
   );
 }
 
@@ -30,16 +33,7 @@ function AppContent() {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<>asdasd</>} />
-        <Route path="/services" element={<Services />} />
-        {!isAuthenticated && <Route path="/login" element={<Login />} />}
-        {isAuthenticated ? <Route path="*" element={<Navigate to="/" />} /> : <Route path="*" element={<Navigate to="/login" />} />}
-
-      </Routes>
-
-
-      {/* {isAuthenticated ? <AppStack /> : <AuthStack />} */}
+      {isAuthenticated ? <AppStack /> : <AuthStack />}
     </Router>
   );
 }

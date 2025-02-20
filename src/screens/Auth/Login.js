@@ -16,7 +16,8 @@ function Login() {
 
         if (username === "gusegarage" && password === "GuseGarage1q2w3e?") {
             localStorage.setItem("token", "gusegarage");
-            
+          
+
             Swal.fire({
                 title: "Giriş Başarılı!",
                 text: "Ana sayfaya yönlendiriliyorsunuz...",
