@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Login from "./screens/Auth/Login";
 import Services from './screens/Services';
+import { useEffect, useState } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 function AuthStack() {
   return (
@@ -14,15 +16,15 @@ function AuthStack() {
 function AppStack() {
   return (
     <Routes>
-      <Route path="/" element={<Services/>} />
-      <Route path="/services" element={<Services/>} />
+      <Route path="/" element={<Services />} />
+      <Route path="/services" element={<Services />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }
 
-function App() {
-  const isAuthenticated = true;
+function AppContent() {
+  const { isAuthenticated } = useAuth();
 
   return (
     <Router>
@@ -31,4 +33,11 @@ function App() {
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
+

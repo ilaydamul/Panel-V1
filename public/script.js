@@ -10,17 +10,4 @@ $(document).ready(function () {
         $(".panel-menu").toggleClass("active");
         $(".panel-shadow").toggleClass("active");
     });
-
-    // var showPass = document.getElementById("show-password");
-    // showPass.addEventListener("click", function () {
-    //     var passInput = document.getElementById("password");
-    //     if (passInput.type == "password") {
-    //         passInput.type = "text";
-    //         showPass.querySelector("i").className = "fa-regular fa-eye-slash";
-    //     }
-    //     else {
-    //         passInput.type = "password";
-    //         showPass.querySelector("i").className = "fa-regular fa-eye";
-    //     }
-    // });
 });

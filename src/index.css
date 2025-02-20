@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
@@ -82,8 +86,12 @@ img {
     text-align: center;
 }
 
-.logo img{
+.logo img {
     max-height: 130px;
+}
+
+header .logo img {
+    max-height: 90px;
 }
 
 .panel-button {
@@ -274,6 +282,34 @@ img {
 }
 
 
+.w-200 {
+    width: 200px;
+}
+
+.h-200 {
+    height: 200px;
+}
+
+.object-contain {
+    object-fit: contain;
+}
+
+.loader {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: #00000036;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.swal2-container {
+    z-index: 9999;
+}
 
 @media screen and (min-width:992px) {
     .toggle-panel.active i {
@@ -460,7 +496,7 @@ img {
 }
 
 @media screen and (max-width:480px) {
-    .form-box{
+    .form-box {
         padding: 1rem;
     }
 }
