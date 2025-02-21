@@ -56,7 +56,7 @@ img {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #FFA023;
+    background: #CF0000;
 }
 
 /*  */
@@ -122,6 +122,61 @@ header .logo img {
     position: absolute;
     left: 1rem;
     top: 1rem;
+}
+
+.panel-button.dp-wrap{
+    padding: 0;
+    overflow: hidden;
+}
+
+.dp-btn{
+    border: none;
+    padding: 0.8rem 1.1rem;
+    width: 100%;
+    text-align: start;
+    background: transparent;
+    position: relative;
+    cursor: pointer;
+}
+
+.dp-menu {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0rem 1.1rem;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+/* Açılma animasyonu */
+.dp-menu.show {
+    max-height: 100px; /* Menü içeriğine bağlı olarak ayarla */
+    padding: 10px 1.1rem;
+}
+
+
+.dp-btn>i{
+    position: absolute;
+    margin: 0;
+    right: 0.8rem;
+    top: 1rem;
+    transition: .2s ease;
+    
+}
+
+.dp-item{
+    margin-bottom: .8rem;
+    width: 100%;
+}
+
+.dp-item i{
+    font-size: .4rem;
+    width: 16px;
+    left: 0.5rem;
+    position: relative;
+    bottom: 0.3rem;
+}
+
+.panel-button.dp-wrap.active .dp-btn>i{
+    transform: rotate(90deg);
 }
 
 .header-footer {
@@ -312,6 +367,10 @@ header .logo img {
     z-index: 9999;
 }
 
+.p-dialog{
+    box-shadow: none;
+}
+
 @media screen and (min-width:992px) {
     .toggle-panel.active i {
         transform: rotate(180deg);
@@ -364,7 +423,7 @@ header .logo img {
     .header-burger {
         color: black;
         position: relative;
-        width: 40px;
+        width: 32px;
         height: 20px;
         padding: 0;
         display: flex;

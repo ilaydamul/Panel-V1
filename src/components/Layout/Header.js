@@ -1,9 +1,10 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import $ from 'jquery'
 import { AuthContext } from '../../context/AuthContext';
 import { NavLink } from 'react-router-dom';
 
 function Header() {
+  const [openDropdown, setOpenDropdown] = useState();
   const authCtx = useContext(AuthContext);
 
   function logout() {
@@ -16,6 +17,11 @@ function Header() {
     $(".panel-menu").toggleClass("active");
     $(".panel-shadow").toggleClass("active");
   }
+
+  const toggleDropdown = (menu) => {
+    setOpenDropdown(openDropdown === menu ? null : menu);
+  };
+
 
   return (
     <header className="panel-header">
@@ -35,8 +41,22 @@ function Header() {
         <div className="pages">
           <NavLink to="/" className="panel-button"><i className="fa-solid fa-house-chimney"></i>
             <span>Anasayfa</span></NavLink>
-          <NavLink to="/services" className="panel-button"><i className="fa-regular fa-chart-bar"></i>
-            <span>Hizmetler</span></NavLink>
+
+          {/* Hizmetler Dropdown */}
+          <div className={`panel-button dp-wrap ${openDropdown === "services" ? "active" : ""}`}>
+            <div onClick={() => toggleDropdown("services")} className='dp-btn'>
+              <span> <i className="fa-regular fa-chart-bar"></i> İçerikler</span>
+              <i className={`fa-solid fa-chevron-right ${openDropdown === "services" ? "rotate" : ""}`}></i>
+            </div>
+
+            <div className={`dp-menu ${openDropdown === "services" ? "show" : ""}`}>
+              <NavLink to="/services" className="dp-item"><i className="fa-solid fa-circle"></i> Hizmetler</NavLink>
+              <NavLink to="/applications" className="dp-item"><i className="fa-solid fa-circle"></i> Uygulamalar</NavLink>
+            </div>
+          </div>
+
+          {/* <NavLink to="/services" className="panel-button"><i className="fa-regular fa-chart-bar"></i>
+            <span>Hizmetler</span></NavLink> */}
         </div>
 
         <div className="header-footer">

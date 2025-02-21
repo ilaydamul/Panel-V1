@@ -12,44 +12,40 @@ import Loader from "../components/UI/Loader";
 import Swal from 'sweetalert2';
 import { BASE_URL } from "../config";
 
-const API_URL = BASE_URL + "/services";
+const API_URL = BASE_URL + "/applications";
 
-const Services = () => {
-    const [services, setServices] = useState([]);
+const Applications = () => {
+    const [applications, setApplications] = useState([]);
     const [dialogVisible, setDialogVisible] = useState(false);
     const [editMode, setEditMode] = useState(false);
-    const [selectedService, setSelectedService] = useState({});
+    const [selectedApp, setSelectedApp] = useState({});
     const [loading, setLoading] = useState(false);
     const fileUploadRef = useRef(null);
 
 
     useEffect(() => {
-        fetchServices();
+        fetchApplications();
     }, []);
 
-    const fetchServices = async () => {
+    const fetchApplications = async () => {
         try {
             const response = await axios.get(API_URL);
-            setServices(response.data);
+            setApplications(response.data);
         } catch (error) {
             console.error("Veriler alınırken hata oluştu:", error);
         }
     };
 
-    const addService = async () => {
+    const addApplication = async () => {
         try {
-            const newService = {
-                ...selectedService,
-                link: convertToSlug(selectedService.title || "")
-            };
 
             // Görseli backend'e yükle
-            if (newService.image) {
-                const imageUrl = await uploadImageToBackend(newService.image);
-                newService.image = BASE_URL + imageUrl;
+            if (selectedApp.image) {
+                const imageUrl = await uploadImageToBackend(selectedApp.image);
+                selectedApp.image = BASE_URL + imageUrl;
             }
 
-            if (!newService.title || !newService.description || !newService.content || !newService.image) {
+            if (!selectedApp.description || !selectedApp.image) {
                 Swal.fire({
                     title: "Boş Alan Bırakmayınız!",
                     icon: "error",
@@ -59,23 +55,24 @@ const Services = () => {
             }
 
             setLoading(true);
-            await axios.post(API_URL, newService);
+            await axios.post(API_URL, selectedApp);
 
-            setServices([...services, newService]);
-            setLoading(false);
+            setApplications([...applications, selectedApp]);
             setDialogVisible(false);
 
         } catch (error) {
-            console.error("Hizmet eklenirken hata oluştu:", error);
+            console.error("Uygulama eklenirken hata oluştu:", error);
             Swal.fire({
-                title: "Hizmet Eklenemedi!",
+                title: "Uygulama Eklenemedi!",
                 icon: "error",
                 confirmButtonText: "Tamam"
             });
+        } finally {
+            setLoading(false);
         }
     };
 
-    const updateService = async (id, updatedService) => {
+    const updateApp = async (id, updatedApp) => {
         const result = await Swal.fire({
             title: "Güncellemek istediğinize emin misiniz?",
             text: "Bu işlem geri alınamaz!",
@@ -87,31 +84,32 @@ const Services = () => {
 
         if (result.isConfirmed) {
 
-            if (updatedService.image && updatedService.image.startsWith("data:image")) {
-                const imageUrl = await uploadImageToBackend(updatedService.image);
-                updatedService.image = BASE_URL + imageUrl; // Backend'den dönen görsel URL'sini kaydediyoruz
+            if (updatedApp.image && updatedApp.image.startsWith("data:image")) {
+                const imageUrl = await uploadImageToBackend(updatedApp.image);
+                updatedApp.image = BASE_URL + imageUrl; // Backend'den dönen görsel URL'sini kaydediyoruz
             }
 
             try {
-                const response = await axios.put(`${BASE_URL}/services/${id}`, updatedService);
+                const response = await axios.put(`${BASE_URL}/applications/${id}`, updatedApp);
                 if (response.status === 200) {
-                    setServices(services.map(service =>
-                        service.id === id ? { ...service, ...updatedService } : service
+                    setApplications(applications.map(app =>
+                        app.id === id ? { ...app, ...updatedApp } : app
                     ));
 
                     Swal.fire({
                         title: "Başarılı!",
-                        text: "Hizmet başarıyla güncellendi.",
+                        text: "Uygulama başarıyla güncellendi.",
                         icon: "success",
                         confirmButtonText: "Tamam"
                     });
+
                 }
             } catch (error) {
-                console.error("Hizmet güncellenirken hata oluştu:", error);
+                console.error("Uygulama güncellenirken hata oluştu:", error);
 
                 Swal.fire({
                     title: "Hata!",
-                    text: "Bir hata oluştu, hizmet güncellenemedi.",
+                    text: "Bir hata oluştu, uygulama güncellenemedi.",
                     icon: "error",
                     confirmButtonText: "Tamam"
                 });
@@ -119,7 +117,7 @@ const Services = () => {
         }
     };
 
-    const deleteService = async (id) => {
+    const deleteApp = async (id) => {
         const result = await Swal.fire({
             title: "Silmek istediğinize emin misiniz?",
             text: "Bu işlem geri alınamaz!",
@@ -131,23 +129,23 @@ const Services = () => {
 
         if (result.isConfirmed) {
             try {
-                const response = await axios.delete(`${BASE_URL}/services/${id}`);
+                const response = await axios.delete(`${BASE_URL}/applications/${id}`);
 
                 if (response.status === 200) {
-                    setServices(services.filter(service => service.id !== id));
+                    setApplications(applications.filter(app => app.id !== id));
                     Swal.fire({
                         title: "Başarılı!",
-                        text: "Hizmet başarıyla silindi.",
+                        text: "Uygulama başarıyla silindi.",
                         icon: "success",
                         confirmButtonText: "Tamam"
                     });
                 }
             } catch (error) {
-                console.error("Hizmet silinirken hata oluştu:", error);
+                console.error("Uygulama silinirken hata oluştu:", error);
 
                 Swal.fire({
                     title: "Hata!",
-                    text: "Bir hata oluştu, hizmet silinemedi.",
+                    text: "Bir hata oluştu, uygulama silinemedi.",
                     icon: "error",
                     confirmButtonText: "Tamam"
                 });
@@ -173,6 +171,8 @@ const Services = () => {
 
         const file = new Blob(byteArrays, { type: 'image/jpeg' }); // Dosya türünü doğru belirleyin
         formData.append("image", file, "image.jpg"); // "image" anahtarıyla dosyayı gönderiyoruz
+        formData.append("type", "applications");
+
 
         try {
             const response = await fetch(BASE_URL + "/uploads", {
@@ -191,20 +191,20 @@ const Services = () => {
         }
     };
 
-    const editService = rowData => {
-        setSelectedService(rowData);
+    const editApp = rowData => {
+        setSelectedApp(rowData);
         setEditMode(true);
         setDialogVisible(true);
     };
 
     const openNew = () => {
-        setSelectedService({});
+        setSelectedApp({});
         setEditMode(false);
         setDialogVisible(true);
     };
 
-    const saveService = () => {
-        editMode ? updateService(selectedService.id, selectedService) : addService();
+    const saveApp = () => {
+        editMode ? updateApp(selectedApp.id, selectedApp) : addApplication();
     };
 
     const actionTemplate = rowData => (
@@ -212,28 +212,15 @@ const Services = () => {
             <Button
                 icon="pi pi-pencil"
                 className="p-button-rounded p-button-info"
-                onClick={() => editService(rowData)}
+                onClick={() => editApp(rowData)}
             />
             <Button
                 icon="pi pi-trash"
                 className="p-button-rounded p-button-danger"
-                onClick={() => deleteService(rowData.id)}
+                onClick={() => deleteApp(rowData.id)}
             />
         </div>
     );
-
-    const convertToSlug = text => {
-        return text
-            .toLowerCase()
-            .replace(/ğ/g, "g")
-            .replace(/ü/g, "u")
-            .replace(/ş/g, "s")
-            .replace(/ı/g, "i")
-            .replace(/ö/g, "o")
-            .replace(/ç/g, "c")
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "");
-    };
 
     const imageTemplate = (rowData) => {
         const imageSrc = rowData.image?.src || rowData.image;
@@ -241,7 +228,7 @@ const Services = () => {
         return imageSrc ? (
             <img
                 src={imageSrc}
-                alt="Hizmet Görseli"
+                alt="Uygulama Görseli"
                 style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "5px" }}
             />
         ) : (
@@ -261,8 +248,7 @@ const Services = () => {
                 />
             </div>
 
-            <DataTable value={services} paginator rows={5} className="p-datatable-striped">
-                <Column field="title" header="Başlık" />
+            <DataTable value={applications} paginator rows={5} className="p-datatable-striped">
                 <Column field="description" header="Açıklama" />
                 <Column field="image" header="Görsel" body={imageTemplate} />
                 <Column body={actionTemplate} header="İşlemler" />
@@ -271,35 +257,22 @@ const Services = () => {
 
             <Dialog
                 visible={dialogVisible}
-                header={editMode ? "Hizmet Düzenle" : "Yeni Hizmet"}
+                header={editMode ? "Uygulama Düzenle" : "Yeni Uygulama"}
                 modal
                 className="p-fluid p-3"
                 draggable={false}
                 onHide={() => setDialogVisible(false)}
             >
                 {loading && <Loader />}
-                <div className="field">
-                    <label>Başlık</label>
-                    <InputText
-                        value={selectedService.title || ""}
-                        onChange={e =>
-                            setSelectedService({
-                                ...selectedService,
-                                title: e.target.value,
-                                link: convertToSlug(e.target.value)
-                            })
-                        }
-                    />
-                </div>
 
                 <div className="field">
                     <label>Açıklama</label>
                     <InputTextarea
-                        value={selectedService.description || ""}
+                        value={selectedApp.description || ""}
                         rows={2}
                         onChange={e =>
-                            setSelectedService({
-                                ...selectedService,
+                            setSelectedApp({
+                                ...selectedApp,
                                 description: e.target.value
                             })
                         }
@@ -307,25 +280,11 @@ const Services = () => {
                 </div>
 
                 <div className="field">
-                    <label>İçerik</label>
-                    <Editor
-                        value={selectedService.content || ""}
-                        onTextChange={e =>
-                            setSelectedService({
-                                ...selectedService,
-                                content: e.htmlValue
-                            })
-                        }
-                        style={{ height: '200px' }}
-                    />
-                </div>
-
-                <div className="field">
                     <label>Görsel</label>
                     <CustomFileUpload
-                        image={selectedService.image}
+                        image={selectedApp.image}
                         fileUploadRef={fileUploadRef}
-                        stateImage={setSelectedService}
+                        stateImage={setSelectedApp}
                     />
                 </div>
 
@@ -334,7 +293,7 @@ const Services = () => {
                         label="Kaydet"
                         icon="pi pi-check"
                         className="p-button-success p-button-rounded"
-                        onClick={() => saveService()}
+                        onClick={() => saveApp()}
                     />
                 </div>
             </Dialog>
@@ -342,4 +301,4 @@ const Services = () => {
     );
 };
 
-export default Services;
+export default Applications;

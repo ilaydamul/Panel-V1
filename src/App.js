@@ -6,6 +6,7 @@ import Login from './screens/Auth/Login';
 import Home from './screens/Home';
 import Services from './screens/Services';
 import Layout from './components/Layout/Layout';
+import Applications from './screens/Applications';
 
 
 function AuthStack() {
@@ -22,6 +23,7 @@ function AppStack() {
       <Routes>
         <Route path="/" element={<Layout title={""}><Home /></Layout>} />
         <Route path="/services" element={<Layout title={"Hizmetler"}><Services /></Layout>} />
+        <Route path="/applications" element={<Layout title={"Uygulamalar"}><Applications /></Layout>} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
   );
