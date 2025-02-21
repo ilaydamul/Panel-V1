@@ -10,8 +10,9 @@ import { InputText } from "primereact/inputtext";
 import CustomFileUpload from "../components/UI/CustomFileUpload";
 import Loader from "../components/UI/Loader";
 import Swal from 'sweetalert2';
+import { BASE_URL } from "../config";
 
-const API_URL = "http://localhost:5000/services";
+const API_URL = BASE_URL + "/services";
 
 const Services = () => {
     const [services, setServices] = useState([]);
@@ -19,6 +20,8 @@ const Services = () => {
     const [editMode, setEditMode] = useState(false);
     const [selectedService, setSelectedService] = useState({});
     const [loading, setLoading] = useState(false);
+    const fileUploadRef = useRef(null);
+
 
     useEffect(() => {
         fetchServices();
@@ -43,7 +46,7 @@ const Services = () => {
             // Görseli backend'e yükle
             if (newService.image) {
                 const imageUrl = await uploadImageToBackend(newService.image);
-                newService.image = "http://localhost:5000" + imageUrl;
+                newService.image = BASE_URL + imageUrl;
             }
 
             if (!newService.title || !newService.description || !newService.content || !newService.image) {
@@ -56,11 +59,11 @@ const Services = () => {
                 return;
             }
 
+            setLoading(true);
+            await axios.post(API_URL, newService);
 
-            const response = await axios.post(API_URL, newService);
-            console.log( response.data);
-            
             setServices([...services, newService]);
+            setLoading(false);
             setDialogVisible(false);
 
         } catch (error) {
@@ -87,11 +90,11 @@ const Services = () => {
 
             if (updatedService.image && updatedService.image.startsWith("data:image")) {
                 const imageUrl = await uploadImageToBackend(updatedService.image);
-                updatedService.image = "http://localhost:5000" + imageUrl; // Backend'den dönen görsel URL'sini kaydediyoruz
+                updatedService.image = BASE_URL + imageUrl; // Backend'den dönen görsel URL'sini kaydediyoruz
             }
 
             try {
-                const response = await axios.put(`http://localhost:5000/services/${id}`, updatedService);
+                const response = await axios.put(`${BASE_URL}/services/${id}`, updatedService);
                 if (response.status === 200) {
                     setServices(services.map(service =>
                         service.id === id ? { ...service, ...updatedService } : service
@@ -129,7 +132,7 @@ const Services = () => {
 
         if (result.isConfirmed) {
             try {
-                const response = await axios.delete(`http://localhost:5000/services/${id}`);
+                const response = await axios.delete(`${BASE_URL}/services/${id}`);
 
                 if (response.status === 200) {
                     setServices(services.filter(service => service.id !== id));
@@ -153,25 +156,6 @@ const Services = () => {
         }
     };
 
-    // Görseli base64 formatında okuma işlemi
-    const handleFileUpload = (event) => {
-        const file = event.files[0]; 
-        if (file) {
-            setLoading(true); 
-            const reader = new FileReader();
-
-            reader.onload = (e) => {
-                setSelectedService((prev) => ({
-                    ...prev,
-                    image: e.target.result 
-                }));
-                setLoading(false); 
-            };
-
-            reader.readAsDataURL(file); 
-        }
-    };
-
     const uploadImageToBackend = async (base64Image) => {
         const formData = new FormData();
         // Base64 verisini dosya formatında backend'e gönderemeyiz. Bunun yerine dosya göndereceğiz.
@@ -192,36 +176,21 @@ const Services = () => {
         formData.append("image", file, "image.jpg"); // "image" anahtarıyla dosyayı gönderiyoruz
 
         try {
-            const response = await fetch("http://localhost:5000/uploads", {
+            const response = await fetch(BASE_URL + "/uploads", {
                 method: "POST",
                 body: formData
             });
 
             const data = await response.json();
             if (data.imageUrl) {
-                return data.imageUrl; // Backend'den dönen görsel URL'sini döndürüyoruz
+                return data.imageUrl;
             }
             throw new Error("Görsel yüklenemedi!");
         } catch (error) {
             console.error("Görsel yükleme hatası:", error);
-            throw error; 
+            throw error;
         }
     };
-
-
-    const fileUploadRef = useRef(null);
-
-    const handleRemoveImage = () => {
-        setSelectedService((prev) => ({
-            ...prev,
-            image: null,
-        }));
-
-        if (fileUploadRef.current) {
-            fileUploadRef.current.clear();
-        }
-    };
-
 
     const editService = rowData => {
         setSelectedService(rowData);
@@ -283,93 +252,92 @@ const Services = () => {
 
 
     return (
-            <div className="pt-3">
-                <div className="items-center mb-3">
-                    <Button
-                        label="Ekle"
-                        icon="pi pi-plus"
-                        className="p-button-success p-button-rounded"
-                        onClick={openNew}
+        <div className="pt-3">
+            <div className="items-center mb-3">
+                <Button
+                    label="Ekle"
+                    icon="pi pi-plus"
+                    className="p-button-success p-button-rounded"
+                    onClick={openNew}
+                />
+            </div>
+
+            <DataTable value={services} paginator rows={5} className="p-datatable-striped">
+                <Column field="title" header="Başlık" />
+                <Column field="description" header="Açıklama" />
+                <Column field="image" header="Görsel" body={imageTemplate} />
+                <Column body={actionTemplate} header="İşlemler" />
+            </DataTable>
+
+
+            <Dialog
+                visible={dialogVisible}
+                header={editMode ? "Hizmet Düzenle" : "Yeni Hizmet"}
+                modal
+                className="p-fluid"
+                onHide={() => setDialogVisible(false)}
+            >
+                {loading && <Loader />}
+                <div className="field">
+                    <label>Başlık</label>
+                    <InputText
+                        value={selectedService.title || ""}
+                        onChange={e =>
+                            setSelectedService({
+                                ...selectedService,
+                                title: e.target.value,
+                                link: convertToSlug(e.target.value)
+                            })
+                        }
                     />
                 </div>
 
-                <DataTable value={services} paginator rows={5} className="p-datatable-striped">
-                    <Column field="title" header="Başlık" />
-                    <Column field="description" header="Açıklama" />
-                    <Column field="image" header="Görsel" body={imageTemplate} />
-                    <Column body={actionTemplate} header="İşlemler" />
-                </DataTable>
+                <div className="field">
+                    <label>Açıklama</label>
+                    <InputTextarea
+                        value={selectedService.description || ""}
+                        rows={2}
+                        onChange={e =>
+                            setSelectedService({
+                                ...selectedService,
+                                description: e.target.value
+                            })
+                        }
+                    />
+                </div>
 
+                <div className="field">
+                    <label>İçerik</label>
+                    <Editor
+                        value={selectedService.content || ""}
+                        onTextChange={e =>
+                            setSelectedService({
+                                ...selectedService,
+                                content: e.htmlValue
+                            })
+                        }
+                    />
+                </div>
 
-                <Dialog
-                    visible={dialogVisible}
-                    header={editMode ? "Hizmet Düzenle" : "Yeni Hizmet"}
-                    modal
-                    className="p-fluid"
-                    onHide={() => setDialogVisible(false)}
-                >
-                    {loading && <Loader />}
-                    <div className="field">
-                        <label>Başlık</label>
-                        <InputText
-                            value={selectedService.title || ""}
-                            onChange={e =>
-                                setSelectedService({
-                                    ...selectedService,
-                                    title: e.target.value,
-                                    link: convertToSlug(e.target.value)
-                                })
-                            }
-                        />
-                    </div>
+                <div className="field">
+                    <label>Görsel</label>
+                    <CustomFileUpload
+                        image={selectedService.image}
+                        fileUploadRef={fileUploadRef}
+                        stateImage={setSelectedService}
+                    />
+                </div>
 
-                    <div className="field">
-                        <label>Açıklama</label>
-                        <InputTextarea
-                            value={selectedService.description || ""}
-                            rows={2}
-                            onChange={e =>
-                                setSelectedService({
-                                    ...selectedService,
-                                    description: e.target.value
-                                })
-                            }
-                        />
-                    </div>
-
-                    <div className="field">
-                        <label>İçerik</label>
-                        <Editor
-                            value={selectedService.content || ""}
-                            onTextChange={e =>
-                                setSelectedService({
-                                    ...selectedService,
-                                    content: e.htmlValue
-                                })
-                            }
-                        />
-                    </div>
-
-                    <div className="field">
-                        <label>Görsel</label>
-                        <CustomFileUpload
-                            handleFileUpload={handleFileUpload}
-                            image={selectedService.image}
-                            handleRemoveImage={handleRemoveImage}
-                            fileUploadRef={fileUploadRef}
-                        />
-                    </div>
-
-                    <div className="btn-area field">
-                        <Button
-                            label="Kaydet"
-                            icon="pi pi-check"
-                            className="p-button-success p-button-rounded"
-                            onClick={() => saveService()}
-                        />
-                    </div>
-                </Dialog>
-            </div>
+                <div className="btn-area field">
+                    <Button
+                        label="Kaydet"
+                        icon="pi pi-check"
+                        className="p-button-success p-button-rounded"
+                        onClick={() => saveService()}
+                    />
+                </div>
+            </Dialog>
+        </div>
     );
 };
 

@@ -2,7 +2,36 @@ import { FileUpload } from "primereact/fileupload";
 import { Button } from "primereact/button";
 import React from "react";
 
-function CustomFileUpload({ handleFileUpload, image, handleRemoveImage, fileUploadRef }) {
+function CustomFileUpload({ image, stateImage, fileUploadRef }) {
+    
+    const handleFileUpload = (event) => {
+        const file = event.files[0]; 
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                stateImage((prev) => ({
+                    ...prev,
+                    image: e.target.result 
+                }));
+             
+            };
+            reader.readAsDataURL(file); 
+        }
+    };
+    
+    const handleRemoveImage = () => {
+        stateImage((prev) => ({
+            ...prev,
+            image: null,
+        }));
+
+        if (fileUploadRef.current) {
+            fileUploadRef.current.clear();
+        }
+    };
+
+    
     return (
         <div className="">
             {image && (
