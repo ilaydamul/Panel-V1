@@ -105,6 +105,8 @@ const Services = () => {
                         icon: "success",
                         confirmButtonText: "Tamam"
                     });
+
+                    setDialogVisible(false);
                 }
             } catch (error) {
                 console.error("Hizmet güncellenirken hata oluştu:", error);
@@ -265,6 +267,7 @@ const Services = () => {
                 <Column field="title" header="Başlık" />
                 <Column field="description" header="Açıklama" />
                 <Column field="image" header="Görsel" body={imageTemplate} />
+                 <Column field="sorting" header="Sıralama" />
                 <Column body={actionTemplate} header="İşlemler" />
             </DataTable>
 
@@ -274,6 +277,7 @@ const Services = () => {
                 header={editMode ? "Hizmet Düzenle" : "Yeni Hizmet"}
                 modal
                 className="p-fluid p-3"
+                style={{maxWidth:"900px"}}
                 draggable={false}
                 onHide={() => setDialogVisible(false)}
             >
@@ -319,6 +323,21 @@ const Services = () => {
                         style={{ height: '200px' }}
                     />
                 </div>
+
+                <div className="field">
+                    <label>Sıralama</label>
+                    <InputText
+                        value={selectedService.sorting || ""}
+                        type="number"
+                        onChange={e =>
+                            setSelectedService({
+                                ...selectedService,
+                                sorting: e.target.value
+                            })
+                        }
+                    />
+                </div>
+
 
                 <div className="field">
                     <label>Görsel</label>

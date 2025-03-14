@@ -5,8 +5,8 @@ import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { InputTextarea } from "primereact/inputtextarea";
-import { Editor } from "primereact/editor";
-import { InputText } from "primereact/inputtext";
+// import { Editor } from "primereact/editor";
+// import { InputText } from "primereact/inputtext";
 import CustomFileUpload from "../components/UI/CustomFileUpload";
 import Loader from "../components/UI/Loader";
 import Swal from 'sweetalert2';
@@ -251,7 +251,7 @@ const Applications = () => {
             <DataTable value={applications} paginator rows={5} className="p-datatable-striped">
                 <Column field="description" header="Açıklama" />
                 <Column field="image" header="Görsel" body={imageTemplate} />
-                <Column body={actionTemplate} header="İşlemler" />
+                 <Column body={actionTemplate} header="İşlemler" />
             </DataTable>
 
 
