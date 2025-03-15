@@ -156,8 +156,13 @@ const Applications = () => {
     const uploadImageToBackend = async (base64Image) => {
         const formData = new FormData();
         // Base64 verisini dosya formatında backend'e gönderemeyiz. Bunun yerine dosya göndereceğiz.
-        const byteCharacters = atob(base64Image.split(',')[1]); // Base64 verisini çözüyoruz
+        const base64Parts = base64Image.split(',');
+        const byteCharacters = atob(base64Parts[1]);
         const byteArrays = [];
+
+        const fileName = "image"; // Eğer base64'ten dosya adını çıkarabiliyorsanız, burada o ismi kullanın
+        const fileExtension = base64Parts[0].split(';')[0].split('/')[1];
+        
 
         for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
             const slice = byteCharacters.slice(offset, offset + 1024);
@@ -169,8 +174,9 @@ const Applications = () => {
             byteArrays.push(byteArray);
         }
 
-        const file = new Blob(byteArrays, { type: 'image/jpeg' }); // Dosya türünü doğru belirleyin
-        formData.append("image", file, "image.jpg"); // "image" anahtarıyla dosyayı gönderiyoruz
+        const file = new Blob(byteArrays, { type: 'image/' + fileExtension }); // Dosya türünü doğru belirleyin
+        // formData.append("image", file, "image.jpg"); // "image" anahtarıyla dosyayı gönderiyoruz
+        formData.append("image", file, fileName + "." + fileExtension);
         formData.append("type", "applications");
 
 
@@ -251,7 +257,7 @@ const Applications = () => {
             <DataTable value={applications} paginator rows={5} className="p-datatable-striped">
                 <Column field="description" header="Açıklama" />
                 <Column field="image" header="Görsel" body={imageTemplate} />
-                 <Column body={actionTemplate} header="İşlemler" />
+                <Column body={actionTemplate} header="İşlemler" />
             </DataTable>
 
 
@@ -259,7 +265,7 @@ const Applications = () => {
                 visible={dialogVisible}
                 header={editMode ? "Uygulama Düzenle" : "Yeni Uygulama"}
                 modal
-                className="p-fluid p-3"
+                className="p-fluid p-3 dialog-screen"
                 draggable={false}
                 onHide={() => setDialogVisible(false)}
             >

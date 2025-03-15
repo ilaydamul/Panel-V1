@@ -124,12 +124,12 @@ header .logo img {
     top: 1rem;
 }
 
-.panel-button.dp-wrap{
+.panel-button.dp-wrap {
     padding: 0;
     overflow: hidden;
 }
 
-.dp-btn{
+.dp-btn {
     border: none;
     padding: 0.8rem 1.1rem;
     width: 100%;
@@ -148,26 +148,27 @@ header .logo img {
 
 /* Açılma animasyonu */
 .dp-menu.show {
-    max-height: 100px; /* Menü içeriğine bağlı olarak ayarla */
+    max-height: 100px;
+    /* Menü içeriğine bağlı olarak ayarla */
     padding: 10px 1.1rem;
 }
 
 
-.dp-btn>i{
+.dp-btn>i {
     position: absolute;
     margin: 0;
     right: 0.8rem;
     top: 1rem;
     transition: .2s ease;
-    
+
 }
 
-.dp-item{
+.dp-item {
     margin-bottom: .8rem;
     width: 100%;
 }
 
-.dp-item i{
+.dp-item i {
     font-size: .4rem;
     width: 16px;
     left: 0.5rem;
@@ -175,7 +176,7 @@ header .logo img {
     bottom: 0.3rem;
 }
 
-.panel-button.dp-wrap.active .dp-btn>i{
+.panel-button.dp-wrap.active .dp-btn>i {
     transform: rotate(90deg);
 }
 
@@ -367,11 +368,19 @@ header .logo img {
     z-index: 9999;
 }
 
-.p-dialog{
+.p-dialog {
     box-shadow: none;
 }
 
+.dialog-screen {
+    max-width: 900px;
+}
+
 @media screen and (min-width:992px) {
+    .dialog-screen {
+        min-width: 900px;
+    }
+
     .toggle-panel.active i {
         transform: rotate(180deg);
     }

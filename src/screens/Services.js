@@ -276,8 +276,8 @@ const Services = () => {
                 visible={dialogVisible}
                 header={editMode ? "Hizmet Düzenle" : "Yeni Hizmet"}
                 modal
-                className="p-fluid p-3"
-                style={{maxWidth:"900px"}}
+                className="p-fluid p-3 dialog-screen"
+                
                 draggable={false}
                 onHide={() => setDialogVisible(false)}
             >
