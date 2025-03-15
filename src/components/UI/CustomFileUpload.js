@@ -12,7 +12,8 @@ function CustomFileUpload({ image, stateImage, fileUploadRef }) {
             reader.onload = (e) => {
                 stateImage((prev) => ({
                     ...prev,
-                    image: e.target.result 
+                    image: e.target.result,
+                    imageName: file.name
                 }));
              
             };

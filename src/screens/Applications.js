@@ -38,10 +38,9 @@ const Applications = () => {
 
     const addApplication = async () => {
         try {
-
             // Görseli backend'e yükle
             if (selectedApp.image) {
-                const imageUrl = await uploadImageToBackend(selectedApp.image);
+                const imageUrl = await uploadImageToBackend(selectedApp.image, selectedApp.imageName); // imageName ile birlikte gönderiyoruz
                 selectedApp.image = BASE_URL + imageUrl;
             }
 
@@ -72,6 +71,7 @@ const Applications = () => {
         }
     };
 
+
     const updateApp = async (id, updatedApp) => {
         const result = await Swal.fire({
             title: "Güncellemek istediğinize emin misiniz?",
@@ -85,7 +85,7 @@ const Applications = () => {
         if (result.isConfirmed) {
 
             if (updatedApp.image && updatedApp.image.startsWith("data:image")) {
-                const imageUrl = await uploadImageToBackend(updatedApp.image);
+                const imageUrl = await uploadImageToBackend(updatedApp.image, selectedApp.imageName);
                 updatedApp.image = BASE_URL + imageUrl; // Backend'den dönen görsel URL'sini kaydediyoruz
             }
 
@@ -103,6 +103,7 @@ const Applications = () => {
                         confirmButtonText: "Tamam"
                     });
 
+                    setDialogVisible(false);
                 }
             } catch (error) {
                 console.error("Uygulama güncellenirken hata oluştu:", error);
@@ -153,16 +154,13 @@ const Applications = () => {
         }
     };
 
-    const uploadImageToBackend = async (base64Image) => {
+    const uploadImageToBackend = async (base64Image, imageName) => {
         const formData = new FormData();
-        // Base64 verisini dosya formatında backend'e gönderemeyiz. Bunun yerine dosya göndereceğiz.
         const base64Parts = base64Image.split(',');
         const byteCharacters = atob(base64Parts[1]);
         const byteArrays = [];
 
-        const fileName = "image"; // Eğer base64'ten dosya adını çıkarabiliyorsanız, burada o ismi kullanın
         const fileExtension = base64Parts[0].split(';')[0].split('/')[1];
-        
 
         for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
             const slice = byteCharacters.slice(offset, offset + 1024);
@@ -174,11 +172,12 @@ const Applications = () => {
             byteArrays.push(byteArray);
         }
 
-        const file = new Blob(byteArrays, { type: 'image/' + fileExtension }); // Dosya türünü doğru belirleyin
-        // formData.append("image", file, "image.jpg"); // "image" anahtarıyla dosyayı gönderiyoruz
-        formData.append("image", file, fileName + "." + fileExtension);
-        formData.append("type", "applications");
+        const file = new Blob(byteArrays, { type: 'image/' + fileExtension });
 
+        formData.append("image", file, imageName);
+        console.log(imageName);
+        
+        formData.append("type", "applications");
 
         try {
             const response = await fetch(BASE_URL + "/uploads", {
@@ -196,6 +195,7 @@ const Applications = () => {
             throw error;
         }
     };
+
 
     const editApp = rowData => {
         setSelectedApp(rowData);

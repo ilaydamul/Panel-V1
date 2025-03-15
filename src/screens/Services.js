@@ -45,7 +45,7 @@ const Services = () => {
 
             // Görseli backend'e yükle
             if (newService.image) {
-                const imageUrl = await uploadImageToBackend(newService.image);
+                const imageUrl = await uploadImageToBackend(newService.image, newService.imageName);
                 newService.image = BASE_URL + imageUrl;
             }
 
@@ -88,7 +88,7 @@ const Services = () => {
         if (result.isConfirmed) {
 
             if (updatedService.image && updatedService.image.startsWith("data:image")) {
-                const imageUrl = await uploadImageToBackend(updatedService.image);
+                const imageUrl = await uploadImageToBackend(updatedService.image, updatedService.imageName);
                 updatedService.image = BASE_URL + imageUrl; // Backend'den dönen görsel URL'sini kaydediyoruz
             }
 
@@ -157,11 +157,13 @@ const Services = () => {
         }
     };
 
-    const uploadImageToBackend = async (base64Image) => {
+    const uploadImageToBackend = async (base64Image, imageName) => {
         const formData = new FormData();
-        // Base64 verisini dosya formatında backend'e gönderemeyiz. Bunun yerine dosya göndereceğiz.
-        const byteCharacters = atob(base64Image.split(',')[1]); // Base64 verisini çözüyoruz
+        const base64Parts = base64Image.split(',');
+        const byteCharacters = atob(base64Parts[1]);
         const byteArrays = [];
+
+        const fileExtension = base64Parts[0].split(';')[0].split('/')[1];
 
         for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
             const slice = byteCharacters.slice(offset, offset + 1024);
@@ -173,8 +175,12 @@ const Services = () => {
             byteArrays.push(byteArray);
         }
 
-        const file = new Blob(byteArrays, { type: 'image/jpeg' }); // Dosya türünü doğru belirleyin
-        formData.append("image", file, "image.jpg"); // "image" anahtarıyla dosyayı gönderiyoruz
+        const file = new Blob(byteArrays, { type: 'image/' + fileExtension });
+
+        formData.append("image", file, imageName);
+        console.log(imageName);
+
+        formData.append("type", "applications");
 
         try {
             const response = await fetch(BASE_URL + "/uploads", {
@@ -267,7 +273,7 @@ const Services = () => {
                 <Column field="title" header="Başlık" />
                 <Column field="description" header="Açıklama" />
                 <Column field="image" header="Görsel" body={imageTemplate} />
-                 <Column field="sorting" header="Sıralama" />
+                <Column field="sorting" header="Sıralama" />
                 <Column body={actionTemplate} header="İşlemler" />
             </DataTable>
 
@@ -277,7 +283,7 @@ const Services = () => {
                 header={editMode ? "Hizmet Düzenle" : "Yeni Hizmet"}
                 modal
                 className="p-fluid p-3 dialog-screen"
-                
+
                 draggable={false}
                 onHide={() => setDialogVisible(false)}
             >
